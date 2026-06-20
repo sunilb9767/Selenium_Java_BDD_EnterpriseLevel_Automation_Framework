@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!-- parallel="tests" runs each <test> block in its own thread -->
+<suite name="Regression Suite" parallel="tests" thread-count="3" data-provider-thread-count="3" verbose="1">
+
+	<test name="Chrome Tests">
+		<!-- browser parameter passed to Hooks.setUp() via system property -->
+		<parameter name="browser" value="chrome" />
+		<classes>
+			<class name="runners.TestRunner" />
+		</classes>
+	</test>
+
+	<test name="Firefox Tests">
+		<parameter name="browser" value="firefox" />
+		<classes>
+			<class name="runners.TestRunner" />
+		</classes>
+	</test>
+
+	<test name="Edge Tests">
+		<parameter name="browser" value="edge" />
+		<classes>
+			<class name="runners.TestRunner" />
+		</classes>
+	</test>
+
+</suite>

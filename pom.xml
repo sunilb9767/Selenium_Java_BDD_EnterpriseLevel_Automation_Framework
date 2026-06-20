@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.SeleniumProject</groupId>
+	<artifactId>AutomatingTestingPractice</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<name>AutomatingTestingPractice</name>
+	<!-- FIXME change it to the project's website -->
+	<url>http://www.example.com</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.release>17</maven.compiler.release>
+
+		<!-- Selenium -->
+		<selenium.version>4.39.0</selenium.version>
+
+		<!-- Cucumber -->
+		<cucumber.version>7.25.0</cucumber.version>
+
+		<!-- JUnit -->
+		<junit.version>4.13.2</junit.version>
+
+		<!-- WebDriverManager -->
+		<webdrivermanager.version>6.1.0</webdrivermanager.version>
+
+		<!-- Log4j -->
+		<log4j.version>2.26.0</log4j.version>
+
+		<!-- Extent Reports -->
+		<extentreports.version>5.0.9</extentreports.version>
+
+	</properties>
+
+
+	<dependencies>
+
+		<!-- Selenium -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>4.39.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+
+		<!-- Cucumber Java -->
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-java</artifactId>
+			<version>7.25.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- Source:
+		https://mvnrepository.com/artifact/io.cucumber/cucumber-testng -->
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-testng</artifactId>
+			<version>7.25.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- Source: https://mvnrepository.com/artifact/org.testng/testng -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>7.12.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Log4j-core -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.26.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- Log4j2 API -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.26.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- Extent reports -->
+		<dependency>
+			<groupId>com.aventstack</groupId>
+			<artifactId>extentreports</artifactId>
+			<version>5.0.9</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- Apache Commons IO -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.21.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- Apache POI -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>5.4.1</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>tech.grasshopper</groupId>
+			<artifactId>extentreports-cucumber7-adapter</artifactId>
+			<version>1.14.0</version>
+		</dependency>
+
+		<!-- Source:
+		https://mvnrepository.com/artifact/tech.grasshopper/extent-pdf-report -->
+		<dependency>
+			<groupId>tech.grasshopper</groupId>
+			<artifactId>extent-pdf-report</artifactId>
+			<version>2.12.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- Picocontainer -->
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-picocontainer</artifactId>
+			<version>7.25.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<plugin>
+
+				<groupId>org.apache.maven.plugins</groupId>
+
+				<artifactId>maven-compiler-plugin</artifactId>
+
+				<version>3.13.0</version>
+
+				<configuration>
+
+					<release>17</release>
+
+				</configuration>
+
+			</plugin>
+
+			<plugin>
+
+				<groupId>org.apache.maven.plugins</groupId>
+
+				<artifactId>maven-surefire-plugin</artifactId>
+
+				<version>3.3.0</version>
+
+				<configuration>
+
+					<suiteXmlFiles>
+						<suiteXmlFile>testng.xml</suiteXmlFile>
+					</suiteXmlFiles>
+
+				</configuration>
+
+			</plugin>
+
+			<plugin>
+
+				<groupId>net.masterthought</groupId>
+
+				<artifactId>maven-cucumber-reporting</artifactId>
+
+				<version>5.8.4</version>
+
+			</plugin>
+
+		</plugins>
+	</build>
+</project>
