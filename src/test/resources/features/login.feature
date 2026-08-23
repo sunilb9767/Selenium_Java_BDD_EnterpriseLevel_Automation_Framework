@@ -9,7 +9,7 @@ Feature: Login Functionality
   # Positive Scenario
   # =====================================================================
 
-  @smoke @positive
+  @TC-LOGIN-001 @smoke @positive
   Scenario: Successful login with valid credentials
     When the user enters valid credentials
     And the user submits the login form
@@ -23,7 +23,7 @@ Feature: Login Functionality
   # expectedMessage kept in table — it is UI text, not sensitive data
   # =====================================================================
 
-  @negative
+  @TC-LOGIN-002 @negative
   Scenario Outline: Login fails with invalid or empty credentials
     When the user attempts login with "<credentialScenario>"
     And the user submits the login form
@@ -44,8 +44,7 @@ Feature: Login Functionality
   # stored in properties file and not production secrets
   # =====================================================================
 
-  @positive @datadriven
-  @positive @datadriven
+  @TC-LOGIN-003 @positive @datadriven
   Scenario Outline: Successful login with multiple valid credential sets
     When the user attempts login with "<credentialScenario>"
     And the user submits the login form
