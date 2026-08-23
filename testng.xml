@@ -2,28 +2,36 @@
 
 
 <!-- parallel="tests" runs each <test> block in its own thread -->
-<suite name="Regression Suite" parallel="tests" thread-count="3" data-provider-thread-count="3" verbose="1">
+<!--
+    LOCAL EXECUTION CONFIG
+    ───────────────────────
+    parallel="none"              → No cross-browser parallelism locally
+                                   Jenkins handles that via pipeline stages
+    data-provider-thread-count   → Scenario parallelism per run
+                                   Tune based on your machine RAM:
+                                   8GB  RAM → 3 threads
+                                   16GB RAM → 5 threads (recommended)
+                                   32GB RAM → 10 threads
 
-	<test name="Chrome Tests">
-		<!-- browser parameter passed to Hooks.setUp() via system property -->
-		<parameter name="browser" value="chrome" />
-		<classes>
-			<class name="runners.TestRunner" />
-		</classes>
-	</test>
+    Browser controlled by:
+    → <parameter> below for local IDE runs
+    → -Dbrowser=chrome for CMD / Jenkins (overrides parameter)
+-->
 
-	<test name="Firefox Tests">
-		<parameter name="browser" value="firefox" />
-		<classes>
-			<class name="runners.TestRunner" />
-		</classes>
-	</test>
+<suite name="Regression-Suite"
+       parallel="none"
+       data-provider-thread-count="5"
+       verbose="1">
 
-	<test name="Edge Tests">
-		<parameter name="browser" value="edge" />
-		<classes>
-			<class name="runners.TestRunner" />
-		</classes>
-	</test>
+    <test name="Regression">
+
+        <!-- Default browser for local runs — overridden by -Dbrowser in CMD/Jenkins -->
+        <parameter name="browser" value="chrome"/>
+
+        <classes>
+            <class name="runners.TestRunner"/>
+        </classes>
+
+    </test>
 
 </suite>

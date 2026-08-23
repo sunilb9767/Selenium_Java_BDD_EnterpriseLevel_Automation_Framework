@@ -45,18 +45,29 @@ public class Hooks {
 
         if (scenario.isFailed()) {
 
-            // Single capture — saved to disk AND bytes returned from the SAME screenshot
-            ScreenshotUtil.ScreenshotResult screenshot =
-                    ScreenshotUtil.captureScreenshot(scenario.getName());
+        	// Single WebDriver call — bytes only, no file written by our code
+            byte[] screenshotBytes = ScreenshotUtil.captureAsBytes(scenario.getName());
 
-            // Attach the SAME bytes to Cucumber report — no second screenshot taken
-            scenario.attach(screenshot.bytes, "image/png", "Failure: " + scenario.getName());
+            if (screenshotBytes.length > 0) {
+            	 
+                // Build the visible label shown in both Spark HTML and PDF reports.
+                // This is the caption the stakeholder sees next to the screenshot.
+                // It is NOT the disk filename — the adapter manages that.
+                String label = ScreenshotUtil.buildScreenshotLabel(scenario.getName());
+                
+             // This is the only attach mechanism confirmed to work from @After
+                // in grasshopper auto-mode. addScreenCaptureFromPath() from @After
+                scenario.attach(screenshotBytes, "image/png", label);
 
-            log.warn("[Hooks] Scenario FAILED: {} | Screenshot: {}",
-                    scenario.getName(), screenshot.path);
+                log.warn("[Hooks] FAILED: '{}' | Screenshot attached to reports.",
+                        scenario.getName());
+            }else {
+            	log.error("[Hooks] FAILED but screenshot capture returned empty bytes: '{}'",
+                        scenario.getName());
+            }
 
         } else {
-            log.info("[Hooks] Scenario PASSED: {}", scenario.getName());
+        	log.info("[Hooks] PASSED: '{}'", scenario.getName());
         }
 
         // Quit browser and remove driver from ThreadLocal for this thread

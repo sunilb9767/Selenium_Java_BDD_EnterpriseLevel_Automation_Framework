@@ -1,0 +1,17 @@
+# =====================================================================
+# staging.properties.example
+# Template for Staging environment configuration.
+# Copy this file to staging.properties and fill in real values.
+# staging.properties is gitignored — do NOT commit it.
+# =====================================================================
+
+# Base URL for Staging environment
+baseUrl=
+
+# Valid login credentials for positive test scenarios
+validUsername=
+validPassword=
+
+# Invalid credentials for negative test scenarios
+invalidUsername=
+invalidPassword=

@@ -56,6 +56,12 @@ public class LoginSteps {
         log.info("[LoginSteps] Attempting login with scenario: {}", credentialScenario);
 
         switch (credentialScenario) {
+        
+        case "valid credentials":
+            // Valid username and password from config — used by data-driven positive scenario
+            loginPage.enterUsername(ConfigReader.getValidUsername());
+            loginPage.enterPassword(ConfigReader.getValidPassword());
+            break;
 
             case "invalid username":
                 // Invalid username from config, valid password from config
@@ -86,7 +92,7 @@ public class LoginSteps {
                 throw new IllegalArgumentException(
                         "[LoginSteps] Unknown credential scenario: '"
                                 + credentialScenario + "'. "
-                                + "Valid values: invalid username, invalid password, "
+                                + "Valid values: valid credentials, invalid username, invalid password, "
                                 + "empty username, empty password"
                 );
         }

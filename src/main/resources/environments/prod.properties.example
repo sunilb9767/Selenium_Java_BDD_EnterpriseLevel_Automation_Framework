@@ -1,0 +1,21 @@
+# =====================================================================
+# prod.properties.example
+# Template for Production environment configuration.
+# Copy this file to prod.properties and fill in real values.
+# prod.properties is gitignored — do NOT commit it.
+#
+# NOTE: Prod credentials should ideally come from CI/CD secrets
+# (environment variables) rather than a local file at all, since
+# this environment carries the highest risk if leaked.
+# =====================================================================
+
+# Base URL for Production environment
+baseUrl=
+
+# Valid login credentials for positive test scenarios
+validUsername=
+validPassword=
+
+# Invalid credentials for negative test scenarios
+invalidUsername=
+invalidPassword=

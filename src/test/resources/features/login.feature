@@ -45,13 +45,13 @@ Feature: Login Functionality
   # =====================================================================
 
   @positive @datadriven
+  @positive @datadriven
   Scenario Outline: Successful login with multiple valid credential sets
-    When the user enters "<username>" in username field
-    And the user enters "<password>" in password field
+    When the user attempts login with "<credentialScenario>"
     And the user submits the login form
     Then the user should be navigated to secure page
     And the secure page should display successful login message
 
     Examples:
-      | username | password             |
-      | practice | SuperSecretPassword! |
+      | credentialScenario |
+      | valid credentials  |

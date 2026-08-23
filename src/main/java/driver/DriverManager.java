@@ -1,7 +1,5 @@
 package driver;
 
-
-
 import config.ConfigReader;
 import utils.WaitUtils;
 import org.apache.logging.log4j.LogManager;
@@ -27,18 +25,39 @@ public class DriverManager {
         // Delegate browser creation entirely to DriverFactory
         WebDriver driver = DriverFactory.createDriver(browser);
 
-        // Apply page load timeout — max seconds to wait for a full page to load
-        driver.manage().timeouts().pageLoadTimeout(
-                Duration.ofSeconds(ConfigReader.getPageLoadTimeout()));
+        try {
 
-        // Clear leftover cookies from any previous session
-        driver.manage().deleteAllCookies();
+            // Apply page load timeout — max seconds to wait for a full page to load
+            driver.manage().timeouts().pageLoadTimeout(
+                    Duration.ofSeconds(ConfigReader.getPageLoadTimeout()));
 
-        // Store driver in ThreadLocal so each thread accesses only its own instance
-        threadLocalDriver.set(driver);
+            // Clear leftover cookies from any previous session
+            driver.manage().deleteAllCookies();
 
-        log.info("[DriverManager] Driver initialized on thread: {}",
-                Thread.currentThread().getName());
+            // Store driver in ThreadLocal so each thread accesses only its own instance
+            threadLocalDriver.set(driver);
+
+            log.info("[DriverManager] Driver initialized on thread: {}",
+                    Thread.currentThread().getName());
+
+        } catch (Exception e) {
+            // Driver was created successfully, but post-creation setup failed
+            // (bad timeout config, flaky session, etc.). The browser is running
+            // but was never stored in ThreadLocal, so nothing else will ever
+            // quit it — clean it up here before this thread loses its handle.
+            log.error("[DriverManager] Post-creation setup failed on thread: {} — quitting orphaned driver. Reason: {}",
+                    Thread.currentThread().getName(), e.getMessage());
+
+            try {
+                driver.quit();
+            } catch (Exception quitEx) {
+                log.warn("[DriverManager] Failed to quit orphaned driver cleanly: {}", quitEx.getMessage());
+            }
+
+            throw new RuntimeException(
+                "[DriverManager] Driver setup failed after browser launch on thread: "
+                        + Thread.currentThread().getName(), e);
+        }
     }
 
     /**

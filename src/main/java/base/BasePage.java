@@ -79,7 +79,7 @@ public class BasePage {
 
     // Clear the field and type the given text into the element
     protected void type(By locator, String text) {
-        log.debug("[BasePage] Typing '{}' into element: {}", text, locator);
+        log.debug("[BasePage] Typing into element: {}", locator);
         WebElement element = WaitUtils.waitForVisible(locator);
         element.clear();
         element.sendKeys(text);

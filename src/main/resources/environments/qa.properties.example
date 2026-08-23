@@ -1,0 +1,17 @@
+# =====================================================================
+# qa.properties.example
+# Template for QA environment configuration.
+# Copy this file to qa.properties and fill in real values.
+# qa.properties is gitignored — do NOT commit it.
+# =====================================================================
+
+# Base URL for QA environment
+baseUrl=
+
+# Valid login credentials for positive test scenarios
+validUsername=
+validPassword=
+
+# Invalid credentials for negative test scenarios
+invalidUsername=
+invalidPassword=

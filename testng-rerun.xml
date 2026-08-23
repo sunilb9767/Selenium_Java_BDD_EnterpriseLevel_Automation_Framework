@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    RERUN SUITE — used only by the "rerun" Maven profile (mvn test -Prerun)
+    Runs runners.RerunRunner against scenarios listed in target/rerun.txt,
+    which Cucumber auto-generates from failures in the main run.
+
+    Sequential (parallel="none") on purpose — reruns should be stable
+    and easy to debug, not fast.
+
+    Browser default: chrome — overridden by -Dbrowser=<name> on CMD/Jenkins.
+-->
+
+<suite name="Rerun-Suite"
+       parallel="none"
+       verbose="1">
+
+    <test name="Rerun">
+
+        <!-- Overridden by -Dbrowser in CMD/Jenkins -->
+        <parameter name="browser" value="chrome"/>
+
+        <classes>
+            <class name="runners.RerunRunner"/>
+        </classes>
+
+    </test>
+
+</suite>

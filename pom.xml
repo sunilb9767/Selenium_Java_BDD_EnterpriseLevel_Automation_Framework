@@ -9,30 +9,51 @@
 	<version>0.0.1-SNAPSHOT</version>
 
 	<name>AutomatingTestingPractice</name>
-	<!-- FIXME change it to the project's website -->
-	<url>http://www.example.com</url>
+	<url>https://practice.expandtesting.com/</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>17</maven.compiler.release>
+
 
 		<!-- Selenium -->
 		<selenium.version>4.39.0</selenium.version>
 
 		<!-- Cucumber -->
 		<cucumber.version>7.25.0</cucumber.version>
-
-		<!-- JUnit -->
-		<junit.version>4.13.2</junit.version>
-
-		<!-- WebDriverManager -->
-		<webdrivermanager.version>6.1.0</webdrivermanager.version>
+		
+		<!-- TestNG -->
+		<testng.version>7.12.0</testng.version>
 
 		<!-- Log4j -->
 		<log4j.version>2.26.0</log4j.version>
 
 		<!-- Extent Reports -->
 		<extentreports.version>5.0.9</extentreports.version>
+
+		<!-- Extent Reports (core + adapter + PDF renderer — bump together) -->
+		<extentreports.version>5.0.9</extentreports.version>
+		<extent.cucumber.adapter.version>1.14.0</extent.cucumber.adapter.version>
+		<extent.pdf.version>2.12.0</extent.pdf.version>
+ 
+		<!-- Apache Commons IO -->
+		<commons.io.version>2.21.0</commons.io.version>
+ 
+		<!-- Apache POI -->
+		<poi.version>5.4.1</poi.version>
+ 
+		<!-- GSON -->
+		<gson.version>2.9.1</gson.version>
+ 
+		<!-- Maven plugin versions -->
+		<maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+		<maven.surefire.plugin.version>3.3.0</maven.surefire.plugin.version>
+		<maven.cucumber.reporting.version>5.8.4</maven.cucumber.reporting.version>
+ 
+		<!-- TestNG data-provider-thread-count default — overridable via -DdataProviderThreadCount -->
+		<dataProviderThreadCount>5</dataProviderThreadCount>
+		
+		
 
 	</properties>
 
@@ -43,7 +64,7 @@
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
-			<version>4.39.0</version>
+			<version>${selenium.version}</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -52,24 +73,23 @@
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-java</artifactId>
-			<version>7.25.0</version>
+			<version>${cucumber.version}</version>
 			<scope>compile</scope>
 		</dependency>
 
-		<!-- Source:
-		https://mvnrepository.com/artifact/io.cucumber/cucumber-testng -->
+		<!-- cucumber-testng -->
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-testng</artifactId>
-			<version>7.25.0</version>
+			<version>${cucumber.version}</version>
 			<scope>compile</scope>
 		</dependency>
 
-		<!-- Source: https://mvnrepository.com/artifact/org.testng/testng -->
+		<!-- testng -->
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>7.12.0</version>
+			<version>${testng.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -77,7 +97,7 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.26.0</version>
+			<version>${log4j.version}</version> 
 			<scope>compile</scope>
 		</dependency>
 
@@ -85,7 +105,7 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.26.0</version>
+			<version>${log4j.version}</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -93,7 +113,7 @@
 		<dependency>
 			<groupId>com.aventstack</groupId>
 			<artifactId>extentreports</artifactId>
-			<version>5.0.9</version>
+			<version>${extentreports.version}</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -101,7 +121,7 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.21.0</version>
+			<version>${commons.io.version}</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -109,22 +129,21 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>5.4.1</version>
+			<version>${poi.version}</version>
 			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>tech.grasshopper</groupId>
 			<artifactId>extentreports-cucumber7-adapter</artifactId>
-			<version>1.14.0</version>
+			<version>${extent.cucumber.adapter.version}</version>
 		</dependency>
 
-		<!-- Source:
-		https://mvnrepository.com/artifact/tech.grasshopper/extent-pdf-report -->
+		<!-- extent-pdf-report -->
 		<dependency>
 			<groupId>tech.grasshopper</groupId>
 			<artifactId>extent-pdf-report</artifactId>
-			<version>2.12.0</version>
+			<version>${extent.pdf.version}</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -132,47 +151,62 @@
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-picocontainer</artifactId>
-			<version>7.25.0</version>
+			<version>${cucumber.version}</version> 
 			<scope>compile</scope>
+		</dependency>
+
+		<!-- GSON -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>${gson.version}</version>
 		</dependency>
 
 	</dependencies>
 
 	<build>
+
 		<plugins>
 
 			<plugin>
-
 				<groupId>org.apache.maven.plugins</groupId>
-
 				<artifactId>maven-compiler-plugin</artifactId>
-
 				<version>3.13.0</version>
-
 				<configuration>
-
 					<release>17</release>
-
+					<fork>true</fork>
+					<compilerArgs>
+						<arg>
+							-J--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+						<arg>
+							-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+						<arg>
+							-J--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+						<arg>
+							-J--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+						<arg>
+							-J--add-opens=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+						<arg>
+							-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+					</compilerArgs>
 				</configuration>
-
 			</plugin>
 
 			<plugin>
-
 				<groupId>org.apache.maven.plugins</groupId>
-
 				<artifactId>maven-surefire-plugin</artifactId>
-
 				<version>3.3.0</version>
-
 				<configuration>
-
 					<suiteXmlFiles>
 						<suiteXmlFile>testng.xml</suiteXmlFile>
 					</suiteXmlFiles>
-
+					<properties>
+						<property>
+							<name>dataproviderthreadcount</name>
+							<value>${dataProviderThreadCount}</value>
+						</property>
+					</properties>
 				</configuration>
-
 			</plugin>
 
 			<plugin>
@@ -187,4 +221,31 @@
 
 		</plugins>
 	</build>
+	<profiles>
+
+		<!--
+        RERUN PROFILE
+        Usage local:   mvn clean test -Prerun
+        Usage Jenkins: mvn clean test -Prerun -Dbrowser=chrome
+                       mvn clean test -Prerun -Dbrowser=edge
+    -->
+		<profile>
+			<id>rerun</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>3.3.0</version>
+						<configuration>
+							<suiteXmlFiles>
+								<suiteXmlFile>testng-rerun.xml</suiteXmlFile>
+							</suiteXmlFiles>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+	</profiles>
 </project>

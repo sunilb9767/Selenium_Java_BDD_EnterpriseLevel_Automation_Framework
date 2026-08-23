@@ -1,0 +1,46 @@
+# =====================================================================
+# PDF Report Configuration
+# Compatible with: tech.grasshopper:extent-pdf-report:2.12.0
+# =====================================================================
+
+# Report color theme
+passColor:  "#00c853"
+failColor:  "#f44336"
+skipColor:  "#ff6d00"
+
+# Dashboard display settings
+displayTag:      true
+displayDevice:   true
+displayAuthor:   true
+displayFeature:  true
+displayScenario: true
+displayDetailed: true
+displayAttached: true
+displayExpanded: false
+
+# Dashboard configuration
+dashboardConfig:
+  title: "Automation Test Report"
+
+# Feature summary — show top 10 features by default
+featureConfig:
+  featureCount: 10
+
+# Scenario summary — show top 10 scenarios
+scenarioConfig:
+  scenarioCount: 10
+
+# Failed scenarios section — show top 20 failed
+noPassScenarioConfig:
+  scenarioCount: 20
+
+# Detailed step config — show 15 steps per page
+detailedStepHookConfig:
+  stepCount:              15
+  skipHooks:              false
+  skipScenarioHooks:      false
+  skipStepHooks:          false
+  skipScenarioBeforeHooks: false
+  skipScenarioAfterHooks:  false
+  skipStepBeforeHooks:    false
+  skipStepAfterHooks:     false

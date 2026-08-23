@@ -149,7 +149,7 @@ public class WaitUtils {
     // Wait for a dynamic element using fluent wait — retries with custom polling
     public static WebElement fluentWaitForVisible(By locator) {
         log.debug("[WaitUtils] Fluent waiting for element to be visible: {}", locator);
-        return getFluentWait().until(driver -> driver.findElement(locator));
+        return getFluentWait().until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
     // Wait for a dynamic element to be clickable using fluent wait

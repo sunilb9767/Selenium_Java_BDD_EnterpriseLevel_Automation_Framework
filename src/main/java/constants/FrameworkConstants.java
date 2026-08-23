@@ -26,23 +26,8 @@ public class FrameworkConstants {
          + "resources" + File.separator
          + "environments" + File.separator;
 
- // Output path for the Extent HTML report — fixed across all environments
- public static final String SPARK_REPORT_PATH = "target" + File.separator
-         + "extent-reports" + File.separator
-         + "SparkReport" + File.separator
-         + "Spark.html";
 
- // Output folder for failure screenshots — fixed across all environments
- public static final String PDF_REPORT_PATH = "target" + File.separator
-         + "extent-reports" + File.separator
-         + "PdfReport" + File.separator
-         + "ExtentReport.pdf";
  
-//← UPDATED — Screenshots folder under target/
- public static final String SCREENSHOTS_PATH = "target" + File.separator
-         + "extent-reports" + File.separator
-         + "screenshots" + File.separator;
-
 
  // Log messages prefix for easy console filtering
  public static final String LOG_PREFIX = "[Framework] ";

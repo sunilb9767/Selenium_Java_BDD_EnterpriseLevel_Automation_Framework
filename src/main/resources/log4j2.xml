@@ -1,47 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
 
-    <Appenders>
+	<Appenders>
 
-        <!-- Prints logs to console during local test runs -->
-        <Console name="ConsoleAppender" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
-        </Console>
+		<!-- Prints logs to console during local test runs -->
+		<Console name="ConsoleAppender" target="SYSTEM_OUT">
+			<PatternLayout
+				pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
 
-        <!-- Writes logs to a file — useful for CI and debugging failures -->
-        <RollingFile name="FileAppender"
-                     fileName="logs/automation.log"
-                     filePattern="logs/automation-%d{yyyy-MM-dd}-%i.log.gz">
+		<!-- Writes logs to a file — useful for CI and debugging failures -->
+		<RollingFile name="FileAppender"
+			fileName="logs/automation.log"
+			filePattern="logs/automation-%d{yyyy-MM-dd}-%i.log.gz">
 
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
+			<PatternLayout
+				pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
 
-            <!-- Roll over log file daily or when it exceeds 10MB -->
-            <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="10MB"/>
-            </Policies>
+			<!-- Roll over log file daily or when it exceeds 10MB -->
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
+				<SizeBasedTriggeringPolicy size="10MB" />
+			</Policies>
 
-            <!-- Keep maximum 30 rolled log files -->
-            <DefaultRolloverStrategy max="30"/>
+			<!-- Keep maximum 30 rolled log files -->
+			<DefaultRolloverStrategy max="30" />
 
-        </RollingFile>
+		</RollingFile>
 
-    </Appenders>
+	</Appenders>
 
-    <Loggers>
+	<Loggers>
 
-        <!-- Framework package — logs at DEBUG level for detailed tracing -->
-        <Logger name="com.yourcompany" level="debug" additivity="false">
-            <AppenderRef ref="ConsoleAppender"/>
-            <AppenderRef ref="FileAppender"/>
-        </Logger>
+		<!-- Framework packages — logs at DEBUG level for detailed tracing -->
+		<Logger name="base" level="debug" additivity="false">
+			<AppenderRef ref="ConsoleAppender" />
+			<AppenderRef ref="FileAppender" />
+		</Logger>
 
-        <!-- Root logger — catches everything else at INFO level -->
-        <Root level="info">
-            <AppenderRef ref="ConsoleAppender"/>
-            <AppenderRef ref="FileAppender"/>
-        </Root>
+		<Logger name="driver" level="debug" additivity="false">
+			<AppenderRef ref="ConsoleAppender" />
+			<AppenderRef ref="FileAppender" />
+		</Logger>
 
-    </Loggers>
+		<Logger name="pages" level="debug" additivity="false">
+			<AppenderRef ref="ConsoleAppender" />
+			<AppenderRef ref="FileAppender" />
+		</Logger>
+
+		<Logger name="utils" level="debug" additivity="false">
+			<AppenderRef ref="ConsoleAppender" />
+			<AppenderRef ref="FileAppender" />
+		</Logger>
+
+		<!-- Root logger — catches everything else (stepdefs, third-party libs) at INFO level -->
+		<Root level="info">
+			<AppenderRef ref="ConsoleAppender" />
+			<AppenderRef ref="FileAppender" />
+		</Root>
+
+	</Loggers>
 
 </Configuration>
