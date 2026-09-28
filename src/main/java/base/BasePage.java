@@ -149,6 +149,17 @@ public class BasePage {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
     }
 
+    // Set the element's value directly via JavaScript — avoids locale-dependent keystrokes on native fields like type="date"
+    protected void setValueViaJs(By locator, String value) {
+        log.debug("[BasePage] Setting value via JS on element: {}", locator);
+        WebElement element = WaitUtils.waitForVisible(locator);
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].value = arguments[1];"
+                + "arguments[0].dispatchEvent(new Event('input', {bubbles: true}));"
+                + "arguments[0].dispatchEvent(new Event('change', {bubbles: true}));",
+                element, value);
+    }
+
     // Scroll the element into the visible area of the browser window
     protected void scrollIntoView(By locator) {
         log.debug("[BasePage] Scrolling element into view: {}", locator);
