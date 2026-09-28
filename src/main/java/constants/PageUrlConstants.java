@@ -17,4 +17,7 @@ public class PageUrlConstants {
 
  // Forgot password page URL path
  public static final String FORGOT_PASSWORD_PAGE = "/forgot-password";
+ 
+ // Web inputs page URL path
+ public static final String INPUTS_PAGE = "/inputs";
 }
