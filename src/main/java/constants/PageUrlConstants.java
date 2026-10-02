@@ -20,4 +20,7 @@ public class PageUrlConstants {
  
  // Web inputs page URL path
  public static final String INPUTS_PAGE = "/inputs";
+ 
+ // Dynamic table page URL path
+ public static final String DYNAMIC_TABLE_PAGE = "/dynamic-table";
 }
