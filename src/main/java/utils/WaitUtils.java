@@ -13,6 +13,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
+import java.util.List;
 
 // Centralised utility class for all explicit and fluent wait operations.
 // All wait logic lives here — BasePage delegates to this class for element resolution.
@@ -140,6 +141,12 @@ public class WaitUtils {
     public static void waitForUrlContains(String partialUrl) {
         log.debug("[WaitUtils] Waiting for URL to contain: {}", partialUrl);
         getExplicitWait().until(ExpectedConditions.urlContains(partialUrl));
+    }
+    
+ // Wait until all matching elements are visible and return them — for tables, lists, header rows
+    public static List<WebElement> waitForAllVisible(By locator) {
+        log.debug("[WaitUtils] Waiting for all elements to be visible: {}", locator);
+        return getExplicitWait().until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
     }
 
     // =====================================================================

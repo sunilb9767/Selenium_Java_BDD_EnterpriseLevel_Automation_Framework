@@ -2,6 +2,10 @@ package base;
 
 import driver.DriverManager;
 import utils.WaitUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -49,6 +53,12 @@ public class BasePage {
         log.debug("[BasePage] Fetching current URL");
         return driver.getCurrentUrl();
     }
+    
+ // Reload the current page
+    public void reloadPage() {
+        log.info("[BasePage] Reloading current page");
+        driver.navigate().refresh();
+    }
 
     // =====================================================================
     // Element interaction methods — explicit wait via WaitUtils
@@ -95,6 +105,14 @@ public class BasePage {
     protected String getAttribute(By locator, String attribute) {
         log.debug("[BasePage] Getting attribute '{}' from element: {}", attribute, locator);
         return WaitUtils.waitForVisible(locator).getAttribute(attribute);
+    }
+    
+ // Return the visible text of every element matching the locator, in DOM order — for tables, lists
+    protected List<String> getTexts(By locator) {
+        log.debug("[BasePage] Getting texts from elements: {}", locator);
+        return WaitUtils.waitForAllVisible(locator).stream()
+                .map(WebElement::getText)
+                .collect(Collectors.toList());
     }
 
     // Return true if the element is visible on the page, false otherwise
