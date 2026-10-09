@@ -20,8 +20,16 @@ public class LoginSteps {
     private static final Logger log = LogManager.getLogger(LoginSteps.class);
 
     // Page objects — initialized fresh per scenario via Hooks driver setup
-    private final LoginPage loginPage   = new LoginPage();
-    private final SecurePage securePage = new SecurePage();
+    private final LoginPage loginPage;
+    private final SecurePage securePage;
+
+    public LoginSteps(
+            LoginPage loginPage,
+            SecurePage securePage) {
+
+        this.loginPage = loginPage;
+        this.securePage = securePage;
+    }
     
     // =====================================================================
     // Given steps
