@@ -1,21 +1,21 @@
 package utils;
-
+ 
 import driver.DriverManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-
-
+ 
+ 
 // Utility class responsible for capturing and saving screenshots on test failure.
 public class ScreenshotUtil {
-
+ 
     // Logger instance for ScreenshotUtil class
     private static final Logger log = LogManager.getLogger(ScreenshotUtil.class);
-
+ 
     // Private constructor prevents instantiation — this is a static utility class
     private ScreenshotUtil() {}
-
+ 
     /**
      * Captures the current browser state as a raw PNG byte array.
      *
@@ -29,6 +29,14 @@ public class ScreenshotUtil {
      * @return raw PNG bytes, or empty array if capture fails (never null)
      */
     public static byte[] captureAsBytes(String scenarioName) {
+ 
+        // CHANGED: DriverManager.getDriver() now throws when there is no driver.
+        // If the browser never started, skip quietly so the original failure is not hidden.
+        if (!DriverManager.hasDriver()) {
+            log.warn("[ScreenshotUtil] No active driver on this thread — skipping screenshot for: '{}'", scenarioName);
+            return new byte[0];
+        }
+ 
         try {
             byte[] bytes = ((TakesScreenshot) DriverManager.getDriver())
                     .getScreenshotAs(OutputType.BYTES);

@@ -1,11 +1,11 @@
 package base;
-
+ 
 import driver.DriverManager;
 import utils.WaitUtils;
-
+ 
 import java.util.List;
 import java.util.stream.Collectors;
-
+ 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -13,57 +13,63 @@ import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
+ 
 // Base class for all Page Object classes.
 // Handles element interactions only — all wait logic delegated to WaitUtils.
 public class BasePage {
-
+ 
     // Logger instance for BasePage class
     private static final Logger log = LogManager.getLogger(BasePage.class);
-
-    // WebDriver instance for the current thread
-    protected WebDriver driver;
-
+ 
+    // CHANGED: the stored "protected WebDriver driver" field was REMOVED.
+    // A page object must never hold on to a driver — it asks for the live one on every use.
+ 
     public BasePage() {
-
-        // Fetch the driver assigned to the current thread from DriverManager
-        this.driver = DriverManager.getDriver();
-
+ 
+        // CHANGED: no driver is fetched here any more, so a page object can be created
+        // (for example by PicoContainer) before the browser has been started by Hooks.
         log.debug("[BasePage] Initialized for page: {}", this.getClass().getSimpleName());
     }
-
+ 
+    // CHANGED (new method): returns the driver of the current thread at the moment of use.
+    // DriverManager.getDriver() throws a clear IllegalStateException if no driver exists,
+    // so there is no null check to repeat here.
+    protected WebDriver driver() {
+        return DriverManager.getDriver();
+    }
+ 
     // =====================================================================
     // Core browser actions
     // =====================================================================
-
+ 
     // Navigate the browser to the given URL
     public void navigateTo(String url) {
         log.info("[BasePage] Navigating to URL: {}", url);
-        driver.get(url);
+        driver().get(url);                                // CHANGED: driver -> driver()
     }
-
+ 
     // Return the title of the currently loaded page
     public String getPageTitle() {
         log.debug("[BasePage] Fetching page title");
-        return driver.getTitle();
+        return driver().getTitle();                       // CHANGED: driver -> driver()
     }
-
+ 
     // Return the current URL of the browser
     public String getCurrentUrl() {
         log.debug("[BasePage] Fetching current URL");
-        return driver.getCurrentUrl();
+        return driver().getCurrentUrl();                  // CHANGED: driver -> driver()
     }
     
  // Reload the current page
     public void reloadPage() {
         log.info("[BasePage] Reloading current page");
-        driver.navigate().refresh();
+        driver().navigate().refresh();                    // CHANGED: driver -> driver()
     }
-
+ 
     // =====================================================================
     // Element interaction methods — explicit wait via WaitUtils
     // =====================================================================
-
+ 
  // Standard click — use this for normal buttons with no overlay issues
     // Waits for element to be clickable before clicking
     // Use this by default on all pages
@@ -86,7 +92,7 @@ public class BasePage {
             jsClick(locator);                            // JS click as last resort only
         }
     }
-
+ 
     // Clear the field and type the given text into the element
     protected void type(By locator, String text) {
         log.debug("[BasePage] Typing into element: {}", locator);
@@ -94,13 +100,13 @@ public class BasePage {
         element.clear();
         element.sendKeys(text);
     }
-
+ 
     // Retrieve the visible text content of the element
     protected String getText(By locator) {
         log.debug("[BasePage] Getting text from element: {}", locator);
         return WaitUtils.waitForVisible(locator).getText();
     }
-
+ 
     // Retrieve the value of the specified HTML attribute from the element
     protected String getAttribute(By locator, String attribute) {
         log.debug("[BasePage] Getting attribute '{}' from element: {}", attribute, locator);
@@ -114,7 +120,7 @@ public class BasePage {
                 .map(WebElement::getText)
                 .collect(Collectors.toList());
     }
-
+ 
     // Return true if the element is visible on the page, false otherwise
     protected boolean isDisplayed(By locator) {
         try {
@@ -125,29 +131,29 @@ public class BasePage {
             return false;
         }
     }
-
+ 
     // Return true if the checkbox or radio button element is selected
     protected boolean isSelected(By locator) {
         log.debug("[BasePage] Checking if element is selected: {}", locator);
         return WaitUtils.waitForVisible(locator).isSelected();
     }
-
+ 
     // Return true if the element is enabled for interaction
     protected boolean isEnabled(By locator) {
         log.debug("[BasePage] Checking if element is enabled: {}", locator);
         return WaitUtils.waitForVisible(locator).isEnabled();
     }
-
+ 
     // =====================================================================
     // Element interaction methods — fluent wait via WaitUtils
     // =====================================================================
-
+ 
     // Click a dynamic element using fluent wait — handles intermittent visibility
     protected void fluentClick(By locator) {
         log.debug("[BasePage] Fluent clicking element: {}", locator);
         WaitUtils.fluentWaitForClickable(locator).click();
     }
-
+ 
     // Type into a dynamic element using fluent wait — handles delayed field rendering
     protected void fluentType(By locator, String text) {
         log.debug("[BasePage] Fluent typing '{}' into element: {}", text, locator);
@@ -155,47 +161,47 @@ public class BasePage {
         element.clear();
         element.sendKeys(text);
     }
-
+ 
     // =====================================================================
     // JavaScript executor methods
     // =====================================================================
-
+ 
     // Click the element using JavaScript — useful when normal click is intercepted
     protected void jsClick(By locator) {
         log.debug("[BasePage] JS clicking element: {}", locator);
         WebElement element = WaitUtils.waitForVisible(locator);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+        ((JavascriptExecutor) driver()).executeScript("arguments[0].click();", element); // CHANGED: driver -> driver()
     }
-
+ 
     // Set the element's value directly via JavaScript — avoids locale-dependent keystrokes on native fields like type="date"
     protected void setValueViaJs(By locator, String value) {
         log.debug("[BasePage] Setting value via JS on element: {}", locator);
         WebElement element = WaitUtils.waitForVisible(locator);
-        ((JavascriptExecutor) driver).executeScript(
+        ((JavascriptExecutor) driver()).executeScript(    // CHANGED: driver -> driver()
                 "arguments[0].value = arguments[1];"
                 + "arguments[0].dispatchEvent(new Event('input', {bubbles: true}));"
                 + "arguments[0].dispatchEvent(new Event('change', {bubbles: true}));",
                 element, value);
     }
-
+ 
     // Scroll the element into the visible area of the browser window
     protected void scrollIntoView(By locator) {
         log.debug("[BasePage] Scrolling element into view: {}", locator);
         WebElement element = WaitUtils.waitForVisible(locator);
-        ((JavascriptExecutor) driver)
+        ((JavascriptExecutor) driver())                   // CHANGED: driver -> driver()
                 .executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
     }
-
+ 
     // Scroll the page to the very top
     protected void scrollToTop() {
         log.debug("[BasePage] Scrolling to top of page");
-        ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0);");
+        ((JavascriptExecutor) driver()).executeScript("window.scrollTo(0, 0);"); // CHANGED: driver -> driver()
     }
-
+ 
     // Scroll the page to the very bottom
     protected void scrollToBottom() {
         log.debug("[BasePage] Scrolling to bottom of page");
-        ((JavascriptExecutor) driver)
+        ((JavascriptExecutor) driver())                   // CHANGED: driver -> driver()
                 .executeScript("window.scrollTo(0, document.body.scrollHeight);");
     }
 }

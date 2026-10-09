@@ -19,8 +19,13 @@ public class DynamicTableSteps {
     // Logger instance for DynamicTableSteps class
     private static final Logger log = LogManager.getLogger(DynamicTableSteps.class);
  
-    // Page object — initialized fresh per scenario via Hooks driver setup
-    private final DynamicTablePage dynamicTablePage = new DynamicTablePage();
+    // CHANGED: page object is now injected by PicoContainer (was: = new DynamicTablePage())
+    private final DynamicTablePage dynamicTablePage;
+ 
+    // CHANGED (new constructor): PicoContainer creates one instance per scenario and passes it in
+    public DynamicTableSteps(DynamicTablePage dynamicTablePage) {
+        this.dynamicTablePage = dynamicTablePage;
+    }
  
     // =====================================================================
     // Given steps
@@ -86,4 +91,5 @@ public class DynamicTableSteps {
         );
     }
 }
+ 
  
