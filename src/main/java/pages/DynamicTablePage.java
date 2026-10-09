@@ -64,7 +64,7 @@ public class DynamicTablePage extends BasePage {
 			throw new NoSuchElementException("[DynamicTablePage] '" + columnHeader + "' column not found in headers: " + headers);
 		}
  
-		for (WebElement row : driver.findElements(tableRows)) {
+		for (WebElement row : driver().findElements(tableRows)) { // CHANGED: driver -> driver()
 			List<WebElement> cells = row.findElements(By.tagName("td"));
 			if (cells.get(nameColumnIndex).getText().equals(rowName)) {
 				return cells.get(targetColumnIndex).getText();
@@ -79,7 +79,7 @@ public class DynamicTablePage extends BasePage {
 		int columnIndex = getColumnHeaders().indexOf(columnHeader);
 		List<String> values = new ArrayList<>();
  
-		for (WebElement row : driver.findElements(tableRows)) {
+		for (WebElement row : driver().findElements(tableRows)) { // CHANGED: driver -> driver()
 			List<WebElement> cells = row.findElements(By.tagName("td"));
 			values.add(cells.get(columnIndex).getText());
 		}
@@ -101,4 +101,5 @@ public class DynamicTablePage extends BasePage {
 		throw new IllegalStateException("[DynamicTablePage] Could not parse Chrome CPU label text: " + fullText);
 	}
 }
+ 
  

@@ -17,8 +17,13 @@ public class InputsSteps {
     // Logger instance for InputsSteps class
     private static final Logger log = LogManager.getLogger(InputsSteps.class);
  
-    // Page object — initialized fresh per scenario via Hooks driver setup
-    private final InputsPage inputsPage = new InputsPage();
+    // CHANGED: page object is now injected by PicoContainer (was: = new InputsPage())
+    private final InputsPage inputsPage;
+ 
+    // CHANGED (new constructor): PicoContainer creates one instance per scenario and passes it in
+    public InputsSteps(InputsPage inputsPage) {
+        this.inputsPage = inputsPage;
+    }
  
     // Entered number, captured from the field's own reported value
     private String enteredNumber;
