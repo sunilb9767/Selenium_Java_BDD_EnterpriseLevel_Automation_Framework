@@ -145,4 +145,33 @@ public class ConfigReader {
 	public static String getInvalidPassword() {
 		return get("invalidPassword");
 	}
+
+	/**
+	 * NEW [GRID]: Returns the browser execution mode. Supported values: local,
+	 * remote.
+	 */
+	public static String getExecutionMode() {
+		String mode = get("executionMode").trim().toLowerCase(java.util.Locale.ROOT);
+		if (!mode.equals("local") && !mode.equals("remote")) {
+			throw new IllegalArgumentException("Unsupported executionMode: " + mode);
+		}
+		return mode;
+	}
+
+	/**
+	 * NEW [GRID]: Returns the Selenium Grid URL. Used only for remote execution.
+	 */
+	public static String getGridUrl() {
+		String value = get("gridUrl").trim();
+		try {
+			java.net.URI uri = java.net.URI.create(value);
+			if (uri.getHost() == null || uri.getRawUserInfo() != null || uri.getRawFragment() != null
+					|| !("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme()))) {
+				throw new IllegalArgumentException("Invalid Grid URL");
+			}
+			return value;
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Invalid gridUrl: expected HTTP(S) Grid endpoint", e);
+		}
+	}
 }

@@ -39,6 +39,19 @@ pipeline {
             choices: ['chrome', 'edge', 'firefox'],
             description: 'Which browser to run the tests on'
         )
+        // NEW [GRID]: Select local or remote browser execution.
+        // Choose between browsers on the agent and browsers on Selenium Grid.
+        choice(
+            name: 'EXECUTION_MODE',
+            choices: ['local', 'remote'],
+            description: 'Browser execution location'
+        )
+        // Grid endpoint must be reachable from the Jenkins build agent.
+        string(
+            name: 'GRID_URL',
+            defaultValue: 'http://localhost:4444',
+            description: 'Reachable Grid URL from the Jenkins agent'
+        )
         choice(
             name: 'ENVIRONMENT',
             choices: ['qa', 'staging', 'prod'],
@@ -132,6 +145,8 @@ pipeline {
                                 -Dbrowser=${params.BROWSER} \
                                 -Denv=${params.ENVIRONMENT} \
                                 -Dheadless=${params.HEADLESS} \
+                                -DexecutionMode=${params.EXECUTION_MODE} \
+                                -DgridUrl=${params.GRID_URL} \
                                 -Dcucumber.filter.tags="${params.TAGS}" \
                                 -DdataProviderThreadCount=${params.THREAD_COUNT}
                         """
@@ -163,7 +178,10 @@ pipeline {
                             mvn -B test -Prerun \
                                 -Dbrowser=${params.BROWSER} \
                                 -Denv=${params.ENVIRONMENT} \
-                                -Dheadless=${params.HEADLESS}
+                                -Dheadless=${params.HEADLESS} \
+                                -DexecutionMode=${params.EXECUTION_MODE} \
+                                -DgridUrl=${params.GRID_URL} \
+                                -DdataProviderThreadCount=${params.THREAD_COUNT}
                         """
                     ).toString()
                 }

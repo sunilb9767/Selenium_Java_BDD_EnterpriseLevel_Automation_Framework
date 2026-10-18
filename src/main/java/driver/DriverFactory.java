@@ -2,10 +2,13 @@ package driver;
 
 import config.ConfigReader;
 import constants.FrameworkConstants;
+import java.net.URI;
+import java.net.MalformedURLException;
+import java.util.Locale;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
-import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -14,142 +17,112 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
-//Responsible only for creating and configuring browser driver instances.
-public class DriverFactory {
-
-	// Logger instance for DriverFactory class
+/** Creates exactly one local or remote browser session per invocation. */
+public final class DriverFactory {
 	private static final Logger log = LogManager.getLogger(DriverFactory.class);
 
-	/**
-	 * Creates a new WebDriver instance for the given browser name.
-	 * @param browser browser name from config.properties or Jenkins parameter
-	 * @return configured WebDriver instance ready for use
-	 */
+	// Prevent creating instances of this utility class.
+	private DriverFactory() {
+	}
+
+	// Create one fresh local or remote browser session.
 	public static WebDriver createDriver(String browser) {
-
-		// Normalize input to avoid case/space mismatches like "Chrome" or " chrome "
-		String browserName = browser.trim().toLowerCase();
-
-		// Read headless flag from config — true in CI/Jenkins, false for local runs
-		boolean isHeadless = ConfigReader.isHeadless();
-
-		log.info("[DriverFactory] Launching browser: {} | Headless: {}", browserName, isHeadless);
-
+		// Reject missing browser names before configuring a driver.
+		if (browser == null || browser.isBlank()) {
+			throw new IllegalArgumentException("Browser must not be blank");
+		}
+		// Normalize the browser name for consistent matching.
+		String name = browser.trim().toLowerCase(Locale.ROOT);
+		// Choose local or remote execution from configuration.
+		String mode = ConfigReader.getExecutionMode(); // NEW [GRID]
+		// Build browser options once for either execution mode.
+		MutableCapabilities options = createOptions(name, ConfigReader.isHeadless());
+		// Log the browser and execution mode for troubleshooting.
+		log.info("[DriverFactory] Browser={} Mode={}", name, mode);
 		try {
-
-			switch (browserName) {
-
-				case FrameworkConstants.CHROME:
-					return createChromeDriver(isHeadless);
-
-				case FrameworkConstants.FIREFOX:
-					return createFirefoxDriver(isHeadless);
-
-				case FrameworkConstants.EDGE:
-					return createEdgeDriver(isHeadless);
-
-				default:
-					// Fail fast with a clear message instead of returning null
-					log.error("[DriverFactory] Unsupported browser: {}", browser);
-					throw new IllegalArgumentException(
-						"[DriverFactory] Unsupported browser: '" + browser + "'. " +
-						"Valid values: chrome, firefox, edge"
-					);
+			// Route remote execution to Selenium Grid.
+			if ("remote".equals(mode)) {
+				// NEW [GRID]: Never silently fall back to a local browser.
+				// Request a new browser session from the configured Grid.
+				RemoteWebDriver driver = new RemoteWebDriver(URI.create(ConfigReader.getGridUrl()).toURL(), options);
+				// Record the Grid session ID for tracing parallel tests.
+				log.info("[DriverFactory] Grid session={}", driver.getSessionId());
+				// Return the newly created remote browser session.
+				return driver;
 			}
-
-		} catch (SessionNotCreatedException e) {
-			// Most common real-world cause: installed browser version and the
-			// driver binary version are out of sync (e.g., Chrome auto-updated
-			// but the cached chromedriver binary didn't).
-			log.error("[DriverFactory] Failed to start '{}' — browser and driver version mismatch. " +
-					"Update the browser or clear the driver cache and retry. Details: {}",
-					browserName, e.getMessage());
-			throw new RuntimeException(
-				"[DriverFactory] Could not start '" + browserName + "': installed browser version " +
-				"is likely incompatible with the driver binary. Update the browser, or clear the " +
-				"driver cache (e.g., ~/.cache/selenium) and retry.", e
-			);
-
+			// Use local WebDriver when local execution is selected.
+			return createLocal(name, options);
+			// Handle an invalid remote URL conversion.
+		} catch (MalformedURLException e) {
+			throw new IllegalArgumentException("Invalid Selenium Grid URL", e);
+			// Wrap Selenium startup failures with execution context.
 		} catch (WebDriverException e) {
-			// Catches other startup failures: driver binary missing/corrupt,
-			// port conflicts, insufficient permissions, etc.
-			log.error("[DriverFactory] Failed to start '{}': {}", browserName, e.getMessage());
-			throw new RuntimeException(
-				"[DriverFactory] Could not start browser '" + browserName + "'. " +
-				"Check that the browser is installed and no stale driver process is holding the port.", e
-			);
+			throw new IllegalStateException("Failed to start " + mode + " browser " + name
+					+ ". Check Grid availability, browser slots and capabilities.", e);
 		}
 	}
 
-	// =====================================================================
-	// Per-browser driver creation — extracted from the switch for clarity
-	// =====================================================================
-
-	private static WebDriver createChromeDriver(boolean isHeadless) {
-
-		ChromeOptions chromeOptions = new ChromeOptions();
-
-		chromeOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
-
-		// Launch Chrome in maximized window to avoid responsive layout issues
-		chromeOptions.addArguments("--start-maximized");
-
-		// Suppress automation-related UI flags using modern Chromium approach
-		chromeOptions.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
-
-		// Disable extensions to prevent interference during test execution
-		chromeOptions.addArguments("--disable-extensions");
-
-		chromeOptions.addArguments("--disable-dev-shm-usage");
-
-		// Enable headless mode for CI runs — uses new headless implementation
-		if (isHeadless) {
-			chromeOptions.addArguments("--headless=new");
-			log.debug("[DriverFactory] Chrome running in headless mode");
+	// REFACTORED [GRID]: Options shared by local and remote execution.
+	// Build browser-specific capabilities for local and remote sessions.
+	private static MutableCapabilities createOptions(String name, boolean headless) {
+		// Choose configuration based on the requested browser.
+		switch (name) {
+		case FrameworkConstants.CHROME:
+			// Create Chrome-specific browser options.
+			ChromeOptions chrome = new ChromeOptions();
+			// Configure Chrome to continue once DOM is ready.
+			chrome.setPageLoadStrategy(PageLoadStrategy.EAGER);
+			// Apply stable Chrome startup arguments.
+			chrome.addArguments("--start-maximized", "--disable-extensions", "--disable-dev-shm-usage");
+			// Apply stable Chrome startup arguments.
+			if (headless)
+				chrome.addArguments("--headless=new", "--window-size=1920,1080");
+			// Return Chrome options for local or Grid execution.
+			return chrome;
+		case FrameworkConstants.FIREFOX:
+			// Create Firefox-specific browser options.
+			FirefoxOptions firefox = new FirefoxOptions();
+			// Configure Firefox page-load behavior.
+			firefox.setPageLoadStrategy(PageLoadStrategy.EAGER);
+			// Run Firefox headlessly when requested.
+			if (headless)
+				firefox.addArguments("-headless", "--width=1920", "--height=1080");
+			// Return Firefox options for local or Grid execution.
+			return firefox;
+		case FrameworkConstants.EDGE:
+			// Create Edge-specific browser options.
+			EdgeOptions edge = new EdgeOptions();
+			// Configure Edge page-load behavior.
+			edge.setPageLoadStrategy(PageLoadStrategy.EAGER);
+			// Apply stable Edge startup arguments.
+			edge.addArguments("--start-maximized", "--disable-extensions", "--disable-dev-shm-usage");
+			// Apply stable Edge startup arguments.
+			if (headless)
+				edge.addArguments("--headless=new", "--window-size=1920,1080");
+			// Return Edge options for local or Grid execution.
+			return edge;
+		default:
+			throw new IllegalArgumentException("Unsupported browser: " + name + " (supported: chrome, firefox, edge)");
 		}
-
-		return new ChromeDriver(chromeOptions);
 	}
 
-	private static WebDriver createFirefoxDriver(boolean isHeadless) {
-
-		FirefoxOptions firefoxOptions = new FirefoxOptions();
-
-		firefoxOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
-
-		// Enable headless mode for CI runs
-		if (isHeadless) {
-			firefoxOptions.addArguments("--headless");
-			log.debug("[DriverFactory] Firefox running in headless mode");
+	// Start the requested browser on the machine running the tests.
+	private static WebDriver createLocal(String name, MutableCapabilities options) {
+		// Choose configuration based on the requested browser.
+		switch (name) {
+		// Launch a local Chrome session.
+		case FrameworkConstants.CHROME:
+			return new ChromeDriver((ChromeOptions) options);
+		// Launch a local Firefox session.
+		case FrameworkConstants.FIREFOX:
+			return new FirefoxDriver((FirefoxOptions) options);
+		// Launch a local Edge session.
+		case FrameworkConstants.EDGE:
+			return new EdgeDriver((EdgeOptions) options);
+		default:
+			throw new IllegalArgumentException("Unsupported browser: " + name);
 		}
-
-		return new FirefoxDriver(firefoxOptions);
-	}
-
-	private static WebDriver createEdgeDriver(boolean isHeadless) {
-
-		EdgeOptions edgeOptions = new EdgeOptions();
-
-		edgeOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
-
-		// Launch Edge in maximized window to avoid responsive layout issues
-		edgeOptions.addArguments("--start-maximized");
-
-		// Suppress automation-related UI flags using modern Chromium approach
-		edgeOptions.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
-
-		// Disable extensions to prevent interference during test execution
-		edgeOptions.addArguments("--disable-extensions");
-
-		edgeOptions.addArguments("--disable-dev-shm-usage");
-
-		// Enable headless mode for CI runs
-		if (isHeadless) {
-			edgeOptions.addArguments("--headless=new");
-			log.debug("[DriverFactory] Edge running in headless mode");
-		}
-
-		return new EdgeDriver(edgeOptions);
 	}
 }
