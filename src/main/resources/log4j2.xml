@@ -6,7 +6,7 @@
 		<!-- Prints logs to console during local test runs -->
 		<Console name="ConsoleAppender" target="SYSTEM_OUT">
 			<PatternLayout
-				pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
+    pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] [Thread-ID:%tid] [Browser:%X{browser}] %-5level %logger{36} - %msg%n"/>
 		</Console>
 
 		<!-- Writes logs to a file — useful for CI and debugging failures -->

@@ -1,0 +1,69 @@
+# NEW [GRID]: Example single-node Chrome Grid for local development.
+# Pin a verified version/digest before using in shared CI.
+
+
+# Selenium Grid Hub with Chrome, Firefox, and Edge nodes.
+services:
+
+  selenium-hub:
+    # Hub receives all remote WebDriver requests.
+    image: selenium/hub:4.39.0
+
+    # Make Grid accessible only from this computer.
+    ports:
+      - "127.0.0.1:4444:4444"
+
+    environment:
+      # Maximum wait time for a browser session request.
+      SE_SESSION_REQUEST_TIMEOUT: "120"
+
+  chrome:
+    # Chrome browser node.
+    image: selenium/node-chrome:4.39.0
+    shm_size: "2gb"
+
+    environment:
+      # Connect Chrome to Selenium Grid Hub.
+      SE_EVENT_BUS_HOST: selenium-hub
+      SE_EVENT_BUS_PUBLISH_PORT: "4442"
+      SE_EVENT_BUS_SUBSCRIBE_PORT: "4443"
+
+      # Allow one browser session per node.
+      SE_NODE_MAX_SESSIONS: "1"
+
+    depends_on:
+      - selenium-hub
+
+  firefox:
+    # Firefox browser node.
+    image: selenium/node-firefox:4.39.0
+    shm_size: "2gb"
+
+    environment:
+      # Connect Firefox to Selenium Grid Hub.
+      SE_EVENT_BUS_HOST: selenium-hub
+      SE_EVENT_BUS_PUBLISH_PORT: "4442"
+      SE_EVENT_BUS_SUBSCRIBE_PORT: "4443"
+
+      # Allow one browser session per node.
+      SE_NODE_MAX_SESSIONS: "1"
+
+    depends_on:
+      - selenium-hub
+
+  edge:
+    # Microsoft Edge browser node.
+    image: selenium/node-edge:4.39.0
+    shm_size: "2gb"
+
+    environment:
+      # Connect Edge to Selenium Grid Hub.
+      SE_EVENT_BUS_HOST: selenium-hub
+      SE_EVENT_BUS_PUBLISH_PORT: "4442"
+      SE_EVENT_BUS_SUBSCRIBE_PORT: "4443"
+
+      # Allow one browser session per node.
+      SE_NODE_MAX_SESSIONS: "1"
+
+    depends_on:
+      - selenium-hub
